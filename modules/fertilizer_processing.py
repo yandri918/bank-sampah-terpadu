@@ -21,6 +21,10 @@ def show():
         input_waste_kg = st.number_input("Input Sampah Organik (kg)", min_value=100, step=50, value=1000)
         target_temp = st.slider("Target Suhu Inti (°C)", 40, 80, 60)
         target_moisture = st.slider("Target Kelembaban (%)", 30, 70, 50)
+        st.subheader("🗓️ Waktu Produksi")
+        start_date = st.date_input("Tanggal Mulai", datetime.now() - timedelta(days=12))
+        start_time = st.time_input("Jam Mulai", datetime.now().time())
+
         # Auto-generate Batch ID based on Date & Type
         type_code = "GEN" # General
         if "Sayuran" in material_type: type_code = "VEG"
@@ -28,10 +32,6 @@ def show():
         
         default_batch_id = f"BATCH-{start_date.strftime('%Y%m%d')}-{type_code}"
         batch_id = st.text_input("Batch ID (Auto/Manual)", value=default_batch_id, help="ID Unik untuk pelacakan produksi.")
-        
-        st.subheader("🗓️ Waktu Produksi")
-        start_date = st.date_input("Tanggal Mulai", datetime.now() - timedelta(days=12))
-        start_time = st.time_input("Jam Mulai", datetime.now().time())
         
         st.button("🔄 Refresh Data Sensor")
 
