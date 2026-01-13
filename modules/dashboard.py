@@ -23,10 +23,28 @@ def show():
         
         total_waste = total_organic + total_precision
         
-        # Simple Valuation Logic (Estimasi)
-        # Organic ~ Rp 500/kg (Kompos)
-        # Anorganic Avg ~ Rp 3,000/kg
-        est_value = (total_organic * 500) + (total_precision * 3000)
+        total_waste = total_organic + total_precision
+        
+        # Detailed Valuation Logic (Matching transformation.py base prices)
+        # Prices defined as per Calculator Standard
+        base_prices = {
+            'Burnable': 200,
+            'Paper': 2500,
+            'Cloth': 1000,
+            'Cans': 12000,
+            'Electronics': 15000,
+            'PET_Bottles': 4500,
+            'Plastic_Marks': 1500,
+            'White_Trays': 500,
+            'Glass_Bottles': 500,
+            'Metal_Small': 3500,
+            'Hazardous': 0
+        }
+        
+        market_value = 0
+        for col, price in base_prices.items():
+            if col in df.columns:
+                market_value += df[col].sum() * price
         
         # Display Metrics
         col1, col2, col3, col4 = st.columns(4)
@@ -38,7 +56,7 @@ def show():
         with col3:
             st.markdown(f'<div class="metric-card"><h3>Material Presisi</h3><h2>{total_precision:,.1f} kg</h2><p>Plastik & Logam</p></div>', unsafe_allow_html=True)
         with col4:
-            st.markdown(f'<div class="metric-card"><h3>Estimasi Nilai</h3><h2>Rp {est_value:,.0f}</h2><p>Potensi Ekonomi</p></div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="metric-card"><h3>Estimasi Nilai</h3><h2>Rp {market_value:,.0f}</h2><p>Potensi Ekonomi (Base Price)</p></div>', unsafe_allow_html=True)
             
         st.markdown("---")
         
