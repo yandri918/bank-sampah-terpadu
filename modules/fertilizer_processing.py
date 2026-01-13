@@ -272,5 +272,66 @@ def show():
         df_lab = pd.DataFrame(lab_data)
         st.dataframe(df_lab.style.format({"Hasil (%)": "{:.4f}", "SNI Min (%)": "{:.4f}"}))
 
+    # --- 5. Balanced Scorecard ---
+    st.markdown("---")
+    st.subheader("🏆 Balanced Scorecard: Pupuk Organik Premium")
+    st.markdown("Key Performance Indicators untuk menjamin kualitas setara industri.")
+    
+    # Radar Chart Data
+    categories = ['Financial', 'Process Efficiency', 'Quality Compliance', 'Environmental Impact']
+    r_values = [75, 95, 88, 60] # Mock scores out of 100
+    
+    col_radar1, col_radar2 = st.columns([1, 2])
+    
+    with col_radar1:
+        # Radar Chart
+        fig_radar = go.Figure(data=go.Scatterpolar(
+            r=r_values,
+            theta=categories,
+            fill='toself',
+            line_color='#2E7d32'
+        ))
+        fig_radar.update_layout(
+            polar=dict(radialaxis=dict(visible=True, range=[0, 100])),
+            margin=dict(l=20, r=20, t=20, b=20),
+            showlegend=False,
+            height=300
+        )
+        st.plotly_chart(fig_radar, use_container_width=True)
+        st.caption("Overall Performance Radar")
+
+    with col_radar2:
+        # Perspectives Details
+        tab_fin, tab_proc, tab_qual, tab_env = st.tabs(["💰 Financial", "⚙️ Process", "🔬 Quality", "🌍 Environmental"])
+        
+        with tab_fin:
+            f1, f2, f3 = st.columns(3)
+            with f1: st.metric("Revenue TARGET", "Rp 18.0M", "Dari Sidebar")
+            with f2: st.metric("Revenue AKTUAL", "Rp 0.0M", "0% (WIP)")
+            with f3: st.metric("ROI Target", "63.9%", "Proyeksi")
+            
+            st.markdown("""
+            - **Biaya/kg**: Rp 104 (Hemat)
+            - **Margin/kg**: Rp 2,396 (Profit Tinggi)
+            """)
+
+        with tab_proc:
+            p1, p2 = st.columns(2)
+            with p1: st.metric("Cycle Time", "21 Hari", "Standar") # Adjusted to input logic
+            with p2: st.metric("Rendemen", "40%", "Efisiensi Massa")
+            st.metric("Throughput", f"{input_waste_kg/21:.1f} kg/hari", "Rata-rata Harian")
+
+        with tab_qual:
+            q1, q2 = st.columns(2)
+            with q1: st.metric("NPK Score", "95%", "vs Target")
+            with q2: st.metric("Defect Rate", "2.5%", "-0.5% (Good)")
+            st.metric("SNI Compliance", "75%", "SNI 19-7030 (On Track)")
+
+        with tab_env:
+            e1, e2 = st.columns(2)
+            with e1: st.metric("Carbon Offset", "0 kg", "CO2e")
+            with e2: st.metric("Methane Avoided", "0 kg", "CH4")
+            st.metric("Landfill Saved", "0.0 m³", "Volume Sampah")
+
     st.success(f"Sistem mendeteksi proses berjalan optimal. Estimasi panen: {max(0, 21 - days_running)} Hari lagi.")
 

@@ -9,7 +9,7 @@ def show():
         col1, col2 = st.columns(2)
         
         with col1:
-            st.date_input("Tanggal Setor", datetime.date.today())
+            tanggal_setor = st.date_input("Tanggal Setor", datetime.date.today())
             nasabah = st.text_input("Nama Nasabah / Sumber", placeholder="Contoh: RT 04 / Bpk. Budi")
         
         with col2:
@@ -57,6 +57,39 @@ def show():
         submitted = st.form_submit_button("Simpan Data Transaksi")
         
         if submitted:
+            # Create Data Record
+            import pandas as pd
+            import os
+
+            new_data = {
+                "Tangent": [datetime.datetime.now()],
+                "Tanggal": [tanggal_setor],
+                "Nasabah": [nasabah],
+                "Petugas": [petugas],
+                "Lokasi": [lokasi],
+                "Burnable": [burnable],
+                "Paper": [paper],
+                "Cloth": [cloth],
+                "Cans": [cans],
+                "Electronics": [electronics],
+                "PET_Bottles": [pet_bottles],
+                "Plastic_Marks": [plastic_marks],
+                "White_Trays": [white_trays],
+                "Glass_Bottles": [glass_bottles],
+                "Metal_Small": [metal_small],
+                "Hazardous": [hazardous]
+            }
+            df_new = pd.DataFrame(new_data)
+            
+            # Save to CSV
+            file_path = "data/waste_data.csv"
+            os.makedirs("data", exist_ok=True)
+            
+            if not os.path.exists(file_path):
+                df_new.to_csv(file_path, index=False)
+            else:
+                df_new.to_csv(file_path, mode='a', header=False, index=False)
+
             total_kg = burnable + paper + cloth + cans + electronics + pet_bottles + plastic_marks + white_trays + glass_bottles + metal_small + hazardous
-            st.success(f"Diterima: {total_kg:.2f} kg sampah dari {nasabah}. Data berhasil disimpan ke sistem.")
+            st.success(f"✅ Data Tersimpan! Diterima: {total_kg:.2f} kg sampah dari {nasabah}.")
             st.balloons()
