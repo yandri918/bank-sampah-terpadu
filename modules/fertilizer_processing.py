@@ -389,8 +389,20 @@ def show():
         # Simulate Revenue vs Cost curve based on Quantity
         
         qty_range = np.linspace(0, output_solid_kg * 2, 50)
-        fixed_cost = batch_depreciation + cost_labor # Assume labor is semi-fixed per batch
-        variable_cost_per_kg = (cost_activator + cost_additive + cost_energy + cost_packaging) / output_solid_kg
+        
+        # Helper to get cost by component name safely
+        def get_cost(name):
+            row = edited_opex[edited_opex['Komponen'] == name]
+            return row['Biaya (Rp)'].values[0] if not row.empty else 0
+            
+        # Attempt to isolate Labor as Fixed Cost (Semi-fixed), others as Variable
+        # If user renamed it, we might fall back to treating it as variable, which is fine for estimation
+        labor_cost = get_cost("Upah Tenaga Kerja")
+        other_opex = total_opex - labor_cost
+        
+        fixed_cost = batch_depreciation + labor_cost 
+        # Variable cost per unit (attributed to Solid Fertilizer for simplicity of manual BEP)
+        variable_cost_per_kg = other_opex / output_solid_kg if output_solid_kg > 0 else 0
         
         total_costs = fixed_cost + (variable_cost_per_kg * qty_range)
         revenues = price_solid * qty_range # Assuming only solid for simple BEP chart
