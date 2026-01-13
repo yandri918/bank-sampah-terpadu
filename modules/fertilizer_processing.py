@@ -92,6 +92,7 @@ def show():
             <h4 style="margin:0">C/N Ratio</h4>
             <h1 style="color:#1565C0; margin:0">{cn_display}</h1>
             <p style="color:green">✅ Ideal Range</p>
+            <p style="font-size:0.8em; color:grey; margin-top:5px;">Progres: Turun dari {cn_start}:1 (Hari 0)</p>
         </div>
         """, unsafe_allow_html=True)
 
