@@ -23,6 +23,17 @@ def show():
         
         st.button("🔄 Refresh Data Sensor")
 
+    # --- 0. Biological Management ---
+    with st.expander("🧬 Manajemen Biologi & Agen Hayati (Bio-Activator)", expanded=False):
+        st.markdown("Integrasi Bioaktivator dari Laboratorium Pupuk Organik untuk akselerasi dekomposisi.")
+        
+        bio_data = {
+            "Agen Hayati": ["ROTAN (Ramuan Organik)", "Trichoderma sp.", "Molase / Gula Baru", "Asam Humat"],
+            "Fungsi Utama": ["Probiotik Sempurna (Selulolitik & Penambat N)", "Antifungi (Perlindungan Akar)", "Sumber Energi Mikroba (Karbon)", "Pembenah Tanah & Khelasi Nutrisi"],
+            "Dosis": ["10-20ml / Liter air", "50gr / m3 sampah", "100ml / 10L air", "2gr / Liter kocor"]
+        }
+        st.table(pd.DataFrame(bio_data))
+
     # --- Logic: Calculate Real-Time metrics based on Inputs ---
     start_datetime = datetime.combine(start_date, start_time)
     current_time = datetime.now()
@@ -85,14 +96,25 @@ def show():
         """, unsafe_allow_html=True)
 
     with kpi4:
-         estimated_yield = input_waste_kg * 0.6 # Approx 40% mass reduction due to moisture loss/co2
+         estimated_yield = input_waste_kg * 0.4 # Yield 40% (1000kg -> 400kg)
+         polybag_count = int(estimated_yield / 0.1) # 100gr per polybag
          st.markdown(f"""
         <div class="metric-card">
             <h4 style="margin:0">Estimasi Output</h4>
             <h1 style="color:#424242; margin:0">{estimated_yield:,.0f} kg</h1>
-            <p>ASAL: {input_waste_kg} kg Sampah</p>
+            <p>Supply: <strong>{polybag_count}</strong> Polybag</p>
         </div>
         """, unsafe_allow_html=True)
+         
+    st.markdown("---")
+    
+    # --- 1.5 Nursery Application Recommendations ---
+    st.info(f"""
+    **📝 Rekomendasi Dosis Aplikasi Nursery (Output: {estimated_yield:,.0f} kg):**
+    - **Media Semai:** Campur 1 bagian pupuk : 3 bagian tanah (Top Soil).
+    - **Polybag (Bibit):** 50-100gr per pohon, frekuensi 2 minggu sekali. (Cukup untuk {polybag_count} bibit/aplikasi)
+    - **Pupuk Cair (POC):** Fermentasi 1kg hasil olahan + 10L air (Dosis 1:10 kocor).
+    """)
 
     st.markdown("---")
 
@@ -221,23 +243,33 @@ def show():
         }))
 
     # --- 4. Quality Grading ---
-    st.subheader("🏆 Final Quality Grading Prediction")
+    # --- 4. Quality Grading & Lab Simulation ---
+    st.subheader("📊 Analisis Kandungan Hara (NPK Lab Simulation)")
+    st.markdown("Hasil simulasi uji laboratorium berdasarkan standarisasi **SNI 19-7030-2004** untuk kompos berkualitas.")
     
-    q1, q2 = st.columns([1, 2])
+    c_lab1, c_lab2 = st.columns([1, 2])
     
-    with q1:
-        st.image("https://img.icons8.com/fluency/96/guarantee.png", width=100)
-        st.markdown("### GRADE A+")
-        st.caption("Premium Organic Fertilizer")
-    
-    with q2:
-        st.write("**Assessment Report:**")
-        st.progress(95)
-        st.caption("Nutrient Content (95/100)")
-        st.progress(90)
-        st.caption("Pathogen Free (90/100)")
-        st.progress(98)
-        st.caption("Maturity / Kematangan (98/100)")
+    with c_lab1:
+        st.success("**🔬 Kesimpulan Lab**")
+        st.metric("C/N Ratio", "12.5", "Matang Sempurna")
+        st.caption("Kompos sudah MATANG SEMPURNA dan aman untuk media tanam nursery.")
         
-    st.success("Sistem mendeteksi proses berjalan optimal. Estimasi panen: 9 Hari lagi.")
+        st.warning("**Note:** Kandungan Nitrogen (2.65%) di atas standar SNI menandakan bahan baku sisa dapur Anda kaya akan protein, sangat baik untuk fase vegetatif sayuran.")
+        
+    with c_lab2:
+        lab_data = {
+            "Grup": ["Primer", "Primer", "Primer", "Sekunder", "Sekunder", "Sekunder", "Mikro", "Mikro", "Mikro", "Lainnya"],
+            "Parameter": ["Nitrogen (N)", "Phosphate (P)", "Kalium (K)", "Kalsium (Ca)", "Magnesium (Mg)", "Sulfur (S)", "Besi (Fe)", "Mangan (Mn)", "Seng (Zn)", "C/N Ratio"],
+            "Hasil (%)": [2.65, 1.95, 2.30, 1.10, 0.45, 0.35, 0.05, 0.02, 0.015, 12.50],
+            "SNI Min (%)": [2.00, 1.50, 1.50, 0.80, 0.30, 0.25, 0.03, 0.01, 0.01, 20.00],
+            "Fungsi Saintifik": [
+                "Pembentukan Klorofil & Vegetatif", "Perkembangan Akar & Pembungaan", "Transportasi Nutrisi & Imun",
+                "Dinding Sel & Aktivasi Enzim", "Inti Klorofil (Fotosintesis)", "Sintesis Protein & Aroma",
+                "Transfer Elektron dalam Sel", "Aktivator Metabolisme Nitrogen", "Sintesis Hormon Auksin (Tumbuh)", "Indikator Kematangan Kompos"
+            ]
+        }
+        df_lab = pd.DataFrame(lab_data)
+        st.dataframe(df_lab.style.format({"Hasil (%)": "{:.4f}", "SNI Min (%)": "{:.4f}"}))
+
+    st.success(f"Sistem mendeteksi proses berjalan optimal. Estimasi panen: {max(0, 21 - days_running)} Hari lagi.")
 
