@@ -273,13 +273,145 @@ def show():
         st.dataframe(df_lab.style.format({"Hasil (%)": "{:.4f}", "SNI Min (%)": "{:.4f}"}))
 
     # --- 5. Balanced Scorecard ---
+    # --- 5. Balanced Scorecard & Advanced Economics ---
     st.markdown("---")
-    st.subheader("🏆 Balanced Scorecard: Pupuk Organik Premium")
-    st.markdown("Key Performance Indicators untuk menjamin kualitas setara industri.")
+    st.subheader("💰 Analisis Ekonomi & Profitabilitas (Advanced)")
+    st.markdown("Simulasi detail Harga Pokok Produksi (HPP) dan potensi keuntungan dari pengolahan sampah organik.")
+
+    # --- Economic Inputs (Sidebar or Top Config) ---
+    with st.expander("⚙️ Konfigurasi Biaya & Harga (Klik untuk Edit)", expanded=False):
+        ec1, ec2, ec3 = st.columns(3)
+        with ec1:
+            st.markdown("**1. Investasi Awal (CAPEX)**")
+            capex_machine = st.number_input("Mesin Pencacah & Ayakan (Rp)", value=15000000)
+            capex_infra = st.number_input("Rumah Kompos & Rak (Rp)", value=25000000)
+            depreciation_months = st.number_input("Penyusutan (Bulan)", value=60) # 5 Years
+            
+        with ec2:
+            st.markdown("**2. Biaya Operasional (OPEX Per Batch)**")
+            cost_labor = st.number_input("Upah Tenaga Kerja (Rp)", value=500000)
+            cost_activator = st.number_input("Bio-Aktivator/EM4 (Rp)", value=150000)
+            cost_additive = st.number_input("Gula/Molase/Dedak (Rp)", value=200000)
+            cost_energy = st.number_input("Listrik & BBM (Rp)", value=50000)
+            cost_packaging = st.number_input("Kemasan & Label (Rp)", value=200000)
+            
+        with ec3:
+            st.markdown("**3. Harga Jual Produk**")
+            price_solid = st.number_input("Harga Kompos Padat (Rp/kg)", value=2500)
+            price_liquid = st.number_input("Harga POC (Rp/Liter)", value=15000)
+            ratio_liquid = st.slider("Rasio Konversi POC (%)", 0, 50, 10, help="% Input jadi Pupuk Cair")
+
+    # --- Calculations ---
+    # Output Calculation
+    output_solid_kg = estimated_yield # Defined earlier (approx 40% of input)
+    output_liquid_l = (input_waste_kg * (ratio_liquid/100)) # 10% input becomes POC
+    
+    # Cost Calculation
+    total_capex = capex_machine + capex_infra
+    monthly_depreciation = total_capex / depreciation_months
+    batch_depreciation = monthly_depreciation / 4 # Assume 4 batches per month
+    
+    total_opex = cost_labor + cost_activator + cost_additive + cost_energy + cost_packaging
+    total_cogs = total_opex + batch_depreciation # Total Cost per Batch
+    
+    # Unit Cost (HPP) - Weighted
+    # Simplify: Attribute cost proportional to revenue potential or just total / yield
+    # Let's simple average for now or focused on solid
+    hpp_per_kg = total_cogs / (output_solid_kg + output_liquid_l) if (output_solid_kg + output_liquid_l) > 0 else 0
+    
+    # Revenue Calculation
+    rev_solid = output_solid_kg * price_solid
+    rev_liquid = output_liquid_l * price_liquid
+    total_revenue = rev_solid + rev_liquid
+    
+    gross_profit = total_revenue - total_opex
+    net_profit = total_revenue - total_cogs
+    
+    margin_pct = (net_profit / total_revenue) * 100 if total_revenue > 0 else 0
+    roi_pct = (net_profit / total_cogs) * 100 if total_cogs > 0 else 0
+
+    # Break Even Point (Qty)
+    # BEP (Unit) = Fixed Costs / (Price - Variable Cost per Unit)
+    # Simplified here for batch context
+    
+    # --- Visualization ---
+    tab_overview, tab_structure, tab_bep = st.tabs(["📊 Profit Sheet", "🍰 Struktur Biaya", "📉 Break-Even Analysis"])
+    
+    with tab_overview:
+        m1, m2, m3, m4 = st.columns(4)
+        with m1: st.metric("Total Revenue", f"Rp {total_revenue:,.0f}", f"Batch: {input_waste_kg}kg")
+        with m2: st.metric("HPP (Total Cost)", f"Rp {total_cogs:,.0f}", f"Termsk Penyusutan")
+        with m3: st.metric("Net Profit", f"Rp {net_profit:,.0f}", f"Margin: {margin_pct:.1f}%")
+        with m4: st.metric("ROI (Return on Investment)", f"{roi_pct:.1f}%", "Efisiensi Modal")
+        
+        st.info(f"💡 **Insight:** Dengan modal Rp {total_cogs:,.0f}, Anda menghasilkan profit bersih Rp {net_profit:,.0f} per siklus.")
+        
+        # Waterfall Chart
+        fig_waterfall = go.Figure(go.Waterfall(
+            name = "Profit Flow", orientation = "v",
+            measure = ["relative", "relative", "total", "relative", "relative", "relative", "relative", "relative", "total"],
+            x = ["Revenue (Solid)", "Revenue (POC)", "Total Sales", "Labor", "Material (Bio)", "Energi", "Kemasan", "Depresiasi", "Net Profit"],
+            textposition = "outside",
+            y = [rev_solid, rev_liquid, total_revenue, -cost_labor, -(cost_activator+cost_additive), -cost_energy, -cost_packaging, -batch_depreciation, net_profit],
+            connector = {"line":{"color":"rgb(63, 63, 63)"}},
+        ))
+        fig_waterfall.update_layout(title = "Profitability Waterfall (Alur Keuntungan)", height=400)
+        st.plotly_chart(fig_waterfall, use_container_width=True)
+
+    with tab_structure:
+        c_pie, c_data = st.columns([2, 1])
+        with c_pie:
+            labels = ['SDM (Labor)', 'Bahan Baku (Bio+Add)', 'Energi', 'Kemasan', 'Penyusutan Mesin']
+            values = [cost_labor, cost_activator+cost_additive, cost_energy, cost_packaging, batch_depreciation]
+            fig_pie = px.pie(values=values, names=labels, title='Struktur Biaya Produksi (HPP)', hole=0.4)
+            st.plotly_chart(fig_pie, use_container_width=True)
+        with c_data:
+            st.write("**Detail Komponen Biaya:**")
+            st.table(pd.DataFrame({
+                'Komponen': labels,
+                'Nilai (Rp)': values,
+                'Persen (%)': [f"{(v/total_cogs)*100:.1f}%" for v in values]
+            }))
+            
+    with tab_bep:
+        st.markdown(f"##### Titik Impas (Break-Even Point)")
+        
+        # BEP Calculation Simulation
+        # Simulate Revenue vs Cost curve based on Quantity
+        
+        qty_range = np.linspace(0, output_solid_kg * 2, 50)
+        fixed_cost = batch_depreciation + cost_labor # Assume labor is semi-fixed per batch
+        variable_cost_per_kg = (cost_activator + cost_additive + cost_energy + cost_packaging) / output_solid_kg
+        
+        total_costs = fixed_cost + (variable_cost_per_kg * qty_range)
+        revenues = price_solid * qty_range # Assuming only solid for simple BEP chart
+        
+        fig_bep = go.Figure()
+        fig_bep.add_trace(go.Scatter(x=qty_range, y=total_costs, name='Total Cost', line=dict(color='red')))
+        fig_bep.add_trace(go.Scatter(x=qty_range, y=revenues, name='Revenue', line=dict(color='green')))
+        
+        # Find intersection
+        idx = np.argwhere(np.diff(np.sign(revenues - total_costs))).flatten()
+        if len(idx) > 0:
+            bep_x = qty_range[idx[0]]
+            bep_y = total_costs[idx[0]]
+            fig_bep.add_annotation(x=bep_x, y=bep_y, text="BEP", showarrow=True, arrowhead=1)
+            st.metric("BEP Quantity (Solid Fertilizer)", f"{bep_x:.0f} kg", "Minimal Penjualan agar Balik Modal")
+            
+        fig_bep.update_layout(
+            title="Analisis Titik Impas (BEP Model)",
+            xaxis_title="Jumlah Produksi (kg)",
+            yaxis_title="Nilai (Rp)"
+        )
+        st.plotly_chart(fig_bep, use_container_width=True)
+
+
+    st.markdown("---")
+    st.subheader("🏆 Balanced Scorecard: Ringkasan Global")
     
     # Radar Chart Data
     categories = ['Financial', 'Process Efficiency', 'Quality Compliance', 'Environmental Impact']
-    r_values = [75, 95, 88, 60] # Mock scores out of 100
+    r_values = [min(100, roi_pct*1.5), 95, 88, 60] # Dynamic Financial Score based on ROI
     
     col_radar1, col_radar2 = st.columns([1, 2])
     
@@ -291,6 +423,7 @@ def show():
             fill='toself',
             line_color='#2E7d32'
         ))
+        # ... keep the rest of scorecard simple ...
         fig_radar.update_layout(
             polar=dict(radialaxis=dict(visible=True, range=[0, 100])),
             margin=dict(l=20, r=20, t=20, b=20),
