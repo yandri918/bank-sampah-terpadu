@@ -25,30 +25,24 @@ def show():
         
         total_waste = total_organic + total_precision
         
-        # Detailed Valuation Logic (Matching transformation.py base prices)
-        # Prices defined as per Calculator Standard
-        total_waste = total_organic + total_precision
+        # Financial Metrics: Dynamic Valuation (Live Market Prices)
+        from modules.price_service import load_prices
+        prices_config = load_prices()
         
-        # Financial Metrics from Data (Preferred)
-        if 'Est_Profit' in df.columns:
-            total_revenue = df['Est_Pendapatan_Bank'].sum()
+        # Calculate Current Inventory Value based on LATEST Sell Prices (Market-to-Market)
+        current_market_value = 0
+        for category, rates in prices_config.items():
+            if category in df.columns:
+                current_market_value += df[category].sum() * rates['sell']
+        
+        # Cost is Historical (Cash Out)
+        if 'Total_Bayar_Nasabah' in df.columns:
             total_cost = df['Total_Bayar_Nasabah'].sum()
-            total_profit = df['Est_Profit'].sum()
         else:
-            # Fallback (Old logic)
-            base_prices = {
-                'Burnable': 300, 'Paper': 3000, 'Cloth': 1500, 'Cans': 14000,
-                'Electronics': 20000, 'PET_Bottles': 5500, 'Plastic_Marks': 2000,
-                'White_Trays': 1000, 'Glass_Bottles': 1000, 'Metal_Small': 4500, 'Hazardous': 0
-            }
-            market_value = 0
-            for col, price in base_prices.items():
-                if col in df.columns:
-                    market_value += df[col].sum() * price
+            total_cost = 0 # Assume 0 if legacy data
             
-            total_revenue = market_value
-            total_cost = 0 # Unknown
-            total_profit = market_value # Assumed 100% (wrong but safe fallback)
+        total_revenue = current_market_value
+        total_profit = total_revenue - total_cost
         
         # Display Financial Dashboard
         st.subheader("💰 Financial Overview")
