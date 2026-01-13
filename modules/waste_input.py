@@ -137,4 +137,51 @@ def show():
             with m3:
                 st.metric("Estimasi Profit", f"Rp {gross_profit:,.0f}", f"{(gross_profit/total_revenue*100) if total_revenue else 0:.1f}% Margin")
             
+            # --- DIGITAL RECEIPT GENERATION ---
+            st.markdown("---")
+            st.subheader("🧾 Kwitansi Digital (Siap Cetak/Salin)")
+            
+            receipt_lines = []
+            receipt_lines.append("=== KWITANSI BANK SAMPAH TERPADU ===")
+            receipt_lines.append(f"Tanggal : {datetime.datetime.now().strftime('%Y-%m-%d %H:%M')}")
+            receipt_lines.append(f"Nasabah : {nasabah}")
+            receipt_lines.append(f"Petugas : {petugas}")
+            receipt_lines.append("-" * 35)
+            receipt_lines.append(f"{'Item':<15} {'Kg':<6} {'Rp/kg':<8} {'Total':<9}")
+            receipt_lines.append("-" * 35)
+            
+            # Helper to add item line
+            def add_line(name, w, p):
+                if w > 0:
+                    subtotal = w * p
+                    receipt_lines.append(f"{name:<15} {w:<6.1f} {p:<8,.0f} {subtotal:<9,.0f}")
+            
+            add_line("Residu/Dapur", w_burn, p_burn)
+            add_line("Kertas/Kardus", w_paper, p_paper)
+            add_line("Kain/Baju", w_cloth, p_cloth)
+            add_line("Kaleng", w_cans, p_cans)
+            add_line("Elektronik", w_elec, p_elec)
+            add_line("Botol Plastik", w_pet, p_pet)
+            add_line("Wadah Plastik", w_plas, p_plas)
+            add_line("Styrofoam", w_tray, p_tray)
+            add_line("Botol Kaca", w_glass, p_glass)
+            add_line("Logam Campur", w_metal, p_metal)
+            add_line("Limbah B3", w_haz, p_haz)
+            
+            receipt_lines.append("-" * 35)
+            receipt_lines.append(f"TOTAL BERAT : {total_kg:.1f} kg")
+            receipt_lines.append(f"TOTAL BAYAR : Rp {total_paid:,.0f}")
+            receipt_lines.append("-" * 35)
+            receipt_lines.append("Terima kasih telah memilah sampah!")
+            receipt_lines.append("         #ZeroWasteIndonesia        ")
+            receipt_lines.append("====================================")
+            
+            receipt_text = "\n".join(receipt_lines)
+            
+            c_receipt, c_action = st.columns([1, 1])
+            with c_receipt:
+                st.text_area("Teks Kwitansi", value=receipt_text, height=350, help="Salin teks ini untuk dikirim via WhatsApp atau dicetak printer thermal.")
+            with c_action:
+                st.info("💡 **Instruksi:**\n1. Blok semua teks di samping (Ctrl+A)\n2. Salin (Ctrl+C)\n3. Tempel ke WhatsApp Nasabah atau Aplikasi Printer Thermal Bluetooth.")
+
             st.balloons()
