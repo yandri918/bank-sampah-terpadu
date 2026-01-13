@@ -23,35 +23,63 @@ def show():
         
         st.button("🔄 Refresh Data Sensor")
 
-    # --- 1. KPI Scorecard ---
-    st.subheader("📊 KPI Scorecard (Live)")
+    # --- Logic: Calculate Real-Time metrics based on Inputs ---
+    start_datetime = datetime.combine(start_date, start_time)
+    current_time = datetime.now()
+    delta = current_time - start_datetime
+    days_running = delta.days
+    hours_running = delta.seconds // 3600
+    total_days_target = 21 # 3 Weeks Fermentation Standard
     
-    # Mock Data for KPIs
+    # 1. Batch Progress
+    progress_pct = min(100, max(0, (days_running / total_days_target) * 100))
+    progress_label = f"Day {days_running}" if days_running >= 0 else "Pending"
+    
+    # 2. C/N Ratio Simulation (Decomposes from 30:1 down to ~15:1 usually)
+    # y = mx + c -> Start 30, Target 15 at day 21
+    cn_start = 30
+    cn_current = max(10, cn_start - (days_running * (15/21)))
+    cn_display = f"{cn_current:.1f}:1"
+    
+    # 3. Quality Score Simulation (Increases as it matures, sensitive to temp stability)
+    # Base score increases with time, maxing at 98. Add some simulated fluctuation.
+    if days_running < 0:
+        quality_score = 0
+    else:
+        base_quality = 50 + (progress_pct * 0.45) # Max ~95 from progress
+        live_fluctuation = np.random.uniform(-0.5, 1.5) # Sensor noise
+        quality_score = min(99.9, base_quality + live_fluctuation)
+        
+    quality_delta = np.random.uniform(-0.5, 0.8) # Week over week change
+
+    # --- 1. KPI Scorecard ---
+    st.subheader("📊 KPI Scorecard (Live Calculation)")
+    
     kpi1, kpi2, kpi3, kpi4 = st.columns(4)
     
     with kpi1:
-        st.markdown("""
+        st.markdown(f"""
         <div class="metric-card">
             <h4 style="margin:0">Quality Score</h4>
-            <h1 style="color:#2E7d32; margin:0">94.5</h1>
-            <p style="color:green">▲ 2.1% vs Target</p>
+            <h1 style="color:#2E7d32; margin:0">{quality_score:.1f}</h1>
+            <p style="color:green">{'▲' if quality_delta > 0 else '▼'} {abs(quality_delta):.1f}% vs Target</p>
         </div>
         """, unsafe_allow_html=True)
         
     with kpi2:
-        st.markdown("""
+        st.markdown(f"""
         <div class="metric-card">
             <h4 style="margin:0">Batch Progress</h4>
-            <h1 style="color:#F9A825; margin:0">Day 12</h1>
-            <p style="color:grey">dari 21 Hari</p>
+            <h1 style="color:#F9A825; margin:0">{progress_label}</h1>
+            <p style="color:grey">dari {total_days_target} Hari ({int(progress_pct)}%)</p>
         </div>
         """, unsafe_allow_html=True)
 
     with kpi3:
-        st.markdown("""
+        st.markdown(f"""
         <div class="metric-card">
             <h4 style="margin:0">C/N Ratio</h4>
-            <h1 style="color:#1565C0; margin:0">22:1</h1>
+            <h1 style="color:#1565C0; margin:0">{cn_display}</h1>
             <p style="color:green">✅ Ideal Range</p>
         </div>
         """, unsafe_allow_html=True)
@@ -128,8 +156,8 @@ def show():
     st.subheader("📈 Production Analytics: Temperature & pH Log")
     
     # Mock Time Series Data based on INPUT DATE
-    start_datetime = datetime.combine(start_date, start_time)
-    current_time = datetime.now()
+    # start_datetime already defined above
+    # current_time already defined above
     
     # Generate hourly data points from start to now (capped at last 50 points to keep chart clean if long duration)
     total_hours = int((current_time - start_datetime).total_seconds() / 3600)
