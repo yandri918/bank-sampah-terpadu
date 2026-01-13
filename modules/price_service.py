@@ -13,7 +13,8 @@ default_pricing = {
     "White_Trays": {"buy": 700, "sell": 1000},    # Margin ~30%
     "Glass_Bottles": {"buy": 700, "sell": 1000},  # Margin ~30%
     "Metal_Small": {"buy": 3000, "sell": 4500},   # Margin ~33%
-    "Hazardous": {"buy": 0, "sell": 0}
+    "Hazardous": {"buy": 0, "sell": 0},
+    "Filament_rPET": {"buy": 0, "sell": 150000}   # Manufactured Product
 }
 
 def load_prices():

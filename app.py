@@ -1,5 +1,5 @@
 import streamlit as st
-from modules import dashboard, waste_input, transformation, fertilizer_processing, price_settings
+from modules import dashboard, waste_input, transformation, fertilizer_processing, price_settings, plastic_upcycling
 
 # Configure the page
 st.set_page_config(
@@ -75,6 +75,8 @@ elif menu == "Pupuk Organik Premium":
     fertilizer_processing.show()
 elif menu == "Pengaturan Harga":
     price_settings.show()
+elif menu == "Upcycling: Plastik ke Filamen":
+    plastic_upcycling.show()
 elif menu == "Panduan 5R":
     st.title("Panduan Pembuangan Sampah")
     st.markdown("Berikut adalah panduan visual klasifikasi sampah (Standard Acuan).")
