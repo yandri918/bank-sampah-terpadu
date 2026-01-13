@@ -349,7 +349,7 @@ def show():
     with tab_overview:
         m1, m2, m3, m4 = st.columns(4)
         with m1: st.metric("Total Revenue", f"Rp {total_revenue:,.0f}", f"Batch: {input_waste_kg}kg")
-        with m2: st.metric("HPP (Total Cost)", f"Rp {total_cogs:,.0f}", f"Termsk Penyusutan")
+        with m2: st.metric("HPP / Kg (Unit Cost)", f"Rp {hpp_per_kg:,.0f}", f"Total Modal: Rp {total_cogs:,.0f}")
         with m3: st.metric("Net Profit", f"Rp {net_profit:,.0f}", f"Margin: {margin_pct:.1f}%")
         with m4: st.metric("ROI (Return on Investment)", f"{roi_pct:.1f}%", "Efisiensi Modal")
         
