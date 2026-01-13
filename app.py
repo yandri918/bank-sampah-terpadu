@@ -57,7 +57,7 @@ with st.sidebar:
     
     menu = st.radio(
         "Navigasi",
-        ["Dashboard Utama", "Input Sampah (Pilah)", "Kalkulator Nilai Ekonomi", "Pupuk Organik Premium", "Pengaturan Harga", "Panduan 5R"],
+        ["Dashboard Utama", "Input Sampah (Pilah)", "Kalkulator Nilai Ekonomi", "Pupuk Organik Premium", "Pengaturan Harga", "Upcycling: Plastik ke Filamen", "Panduan 5R"],
         index=0
     )
     
