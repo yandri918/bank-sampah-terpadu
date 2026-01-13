@@ -1,5 +1,5 @@
 import streamlit as st
-from modules import dashboard, waste_input, transformation, fertilizer_processing
+from modules import dashboard, waste_input, transformation, fertilizer_processing, price_settings
 
 # Configure the page
 st.set_page_config(
@@ -57,7 +57,7 @@ with st.sidebar:
     
     menu = st.radio(
         "Navigasi",
-        ["Dashboard Utama", "Input Sampah (Pilah)", "Kalkulator Nilai Ekonomi", "Pupuk Organik Premium", "Panduan 5R"],
+        ["Dashboard Utama", "Input Sampah (Pilah)", "Kalkulator Nilai Ekonomi", "Pupuk Organik Premium", "Pengaturan Harga", "Panduan 5R"],
         index=0
     )
     
@@ -73,6 +73,8 @@ elif menu == "Kalkulator Nilai Ekonomi":
     transformation.show()
 elif menu == "Pupuk Organik Premium":
     fertilizer_processing.show()
+elif menu == "Pengaturan Harga":
+    price_settings.show()
 elif menu == "Panduan 5R":
     st.title("Panduan Pembuangan Sampah")
     st.markdown("Berikut adalah panduan visual klasifikasi sampah (Standard Acuan).")

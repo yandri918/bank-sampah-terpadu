@@ -1,24 +1,15 @@
 import streamlit as st
 import datetime
 
+from modules.price_service import load_prices
+
 def show():
-    # Market Selling Prices (Harga Jual ke Pabrik/Pengepul Besar)
-    selling_prices = {
-        "Burnable": 300,        # Jual Listrik/Kompos
-        "Paper": 3000,          # Jual Pabrik Kertas
-        "Cloth": 1500,          # Jual Upcycle
-        "Cans": 14000,          # Jual Peleburan
-        "Electronics": 20000,   # Jual Komponen
-        "PET_Bottles": 5500,    # Jual Pencacah
-        "Plastic_Marks": 2000,  # Jual Pelet
-        "White_Trays": 1000,    # Jual Daur Ulang
-        "Glass_Bottles": 1000,  # Jual Pabrik Kaca
-        "Metal_Small": 4500,    # Jual Besi Tua
-        "Hazardous": 0          # Cost
-    }
+    # Load Real-Time Configuted Prices
+    prices_config = load_prices()
     
-    # Default Buying Prices (Harga Beli dari Nasabah - Margin ~30-40%)
-    buying_defaults = {k: int(v * 0.7) for k, v in selling_prices.items()}
+    # Extract maps for easy lookup
+    selling_prices = {k: v['sell'] for k, v in prices_config.items()}
+    buying_defaults = {k: v['buy'] for k, v in prices_config.items()}
 
     with st.form("waste_input_form"):
         col1, col2 = st.columns(2)
