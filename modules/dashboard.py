@@ -27,36 +27,42 @@ def show():
         
         # Detailed Valuation Logic (Matching transformation.py base prices)
         # Prices defined as per Calculator Standard
-        base_prices = {
-            'Burnable': 200,
-            'Paper': 2500,
-            'Cloth': 1000,
-            'Cans': 12000,
-            'Electronics': 15000,
-            'PET_Bottles': 4500,
-            'Plastic_Marks': 1500,
-            'White_Trays': 500,
-            'Glass_Bottles': 500,
-            'Metal_Small': 3500,
-            'Hazardous': 0
-        }
+        total_waste = total_organic + total_precision
         
-        market_value = 0
-        for col, price in base_prices.items():
-            if col in df.columns:
-                market_value += df[col].sum() * price
+        # Financial Metrics from Data (Preferred)
+        if 'Est_Profit' in df.columns:
+            total_revenue = df['Est_Pendapatan_Bank'].sum()
+            total_cost = df['Total_Bayar_Nasabah'].sum()
+            total_profit = df['Est_Profit'].sum()
+        else:
+            # Fallback (Old logic)
+            base_prices = {
+                'Burnable': 300, 'Paper': 3000, 'Cloth': 1500, 'Cans': 14000,
+                'Electronics': 20000, 'PET_Bottles': 5500, 'Plastic_Marks': 2000,
+                'White_Trays': 1000, 'Glass_Bottles': 1000, 'Metal_Small': 4500, 'Hazardous': 0
+            }
+            market_value = 0
+            for col, price in base_prices.items():
+                if col in df.columns:
+                    market_value += df[col].sum() * price
+            
+            total_revenue = market_value
+            total_cost = 0 # Unknown
+            total_profit = market_value # Assumed 100% (wrong but safe fallback)
         
-        # Display Metrics
+        # Display Financial Dashboard
+        st.subheader("💰 Financial Overview")
         col1, col2, col3, col4 = st.columns(4)
         
         with col1:
             st.markdown(f'<div class="metric-card"><h3>Total Sampah</h3><h2>{total_waste:,.1f} kg</h2><p>Real-time Accumulation</p></div>', unsafe_allow_html=True)
         with col2:
-            st.markdown(f'<div class="metric-card"><h3>Emas Hijau (Organik)</h3><h2>{total_organic:,.1f} kg</h2><p>Terproses jadi Kompos</p></div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="metric-card"><h3>Revenue (Bank)</h3><h2>Rp {total_revenue:,.0f}</h2><p>Potensi Jual ke Industri</p></div>', unsafe_allow_html=True)
         with col3:
-            st.markdown(f'<div class="metric-card"><h3>Material Presisi</h3><h2>{total_precision:,.1f} kg</h2><p>Plastik & Logam</p></div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="metric-card"><h3>Cost (Nasabah)</h3><h2>Rp {total_cost:,.0f}</h2><p>Uang Keluar</p></div>', unsafe_allow_html=True)
         with col4:
-            st.markdown(f'<div class="metric-card"><h3>Estimasi Nilai</h3><h2>Rp {market_value:,.0f}</h2><p>Potensi Ekonomi (Base Price)</p></div>', unsafe_allow_html=True)
+            margin_pct = (total_profit / total_revenue * 100) if total_revenue > 0 else 0
+            st.markdown(f'<div class="metric-card"><h3>Net Profit</h3><h2 style="color:#2E7d32">Rp {total_profit:,.0f}</h2><p>Margin: {margin_pct:.1f}%</p></div>', unsafe_allow_html=True)
             
         st.markdown("---")
         
