@@ -16,6 +16,11 @@ def show():
         target_temp = st.slider("Target Suhu Inti (°C)", 40, 80, 60)
         target_moisture = st.slider("Target Kelembaban (%)", 30, 70, 50)
         batch_id = st.selectbox("Batch ID", ["BATCH-2026-001", "BATCH-2026-002", "BATCH-2026-003"])
+        
+        st.subheader("🗓️ Waktu Produksi")
+        start_date = st.date_input("Tanggal Mulai", datetime.now() - timedelta(days=12))
+        start_time = st.time_input("Jam Mulai", datetime.now().time())
+        
         st.button("🔄 Refresh Data Sensor")
 
     # --- 1. KPI Scorecard ---
@@ -122,14 +127,42 @@ def show():
     # --- 3. Production Analytics ---
     st.subheader("📈 Production Analytics: Temperature & pH Log")
     
-    # Mock Time Series Data
-    hours = [datetime.now() - timedelta(hours=x) for x in range(24)]
-    hours.reverse()
+    # Mock Time Series Data based on INPUT DATE
+    start_datetime = datetime.combine(start_date, start_time)
+    current_time = datetime.now()
     
+    # Generate hourly data points from start to now (capped at last 50 points to keep chart clean if long duration)
+    total_hours = int((current_time - start_datetime).total_seconds() / 3600)
+    if total_hours < 1: total_hours = 1
+    
+    # Create time range
+    display_hours = min(total_hours, 168) # Show max last 7 days (168 hours) or total duration
+    time_range = [current_time - timedelta(hours=x) for x in range(display_hours)]
+    time_range.reverse()
+    
+    # Generate synthetic trend based on fermentation stage (Day 1-3 Rising, Day 4-15 Stable High, Day 15+ Cooling)
+    temps = []
+    phs = []
+    
+    for t in time_range:
+        elapsed_days = (t - start_datetime).days
+        noise = np.random.normal(0, 0.5)
+        
+        # Temp Logic
+        if elapsed_days < 3: temp_val = 30 + (elapsed_days * 10) + noise # Rising phase
+        elif elapsed_days < 15: temp_val = 60 + np.sin(t.hour/4)*2 + noise # Thermophilic phase
+        else: temp_val = 45 - (elapsed_days - 15) + noise # Cooling phase
+        temps.append(temp_val)
+        
+        # pH Logic
+        if elapsed_days < 5: ph_val = 6.0 - (elapsed_days * 0.1) + (noise*0.1) # Acidic start
+        else: ph_val = 6.5 + min((elapsed_days-5)*0.1, 1.0) + (noise*0.1) # Stabilizing to neutral
+        phs.append(ph_val)
+
     df_log = pd.DataFrame({
-        'Waktu': hours,
-        'Suhu (°C)': [60 + np.sin(x/4)*5 + np.random.normal(0, 1) for x in range(24)],
-        'pH Tanah': [6.8 + np.cos(x/6)*0.2 + np.random.normal(0, 0.05) for x in range(24)]
+        'Waktu': time_range,
+        'Suhu (°C)': temps,
+        'pH Tanah': phs
     })
     
     c1, c2 = st.columns([2, 1])
@@ -144,8 +177,20 @@ def show():
     with c2:
         fig_ph = px.line(df_log, x='Waktu', y='pH Tanah', title="Stabilitas pH", markers=False)
         fig_ph.update_traces(line_color='#1565C0')
-        fig_ph.update_yaxes(range=[5, 9])
+        fig_ph.update_yaxes(range=[4, 9])
         st.plotly_chart(fig_ph, use_container_width=True)
+
+    # --- 3.5 Related Info (Logs) ---
+    with st.expander("📝 Log Catatan & Informasi Terkait", expanded=True):
+        st.markdown(f"**Batch Start:** {start_datetime.strftime('%d %B %Y %H:%M')}")
+        st.info("ℹ️ Fase Saat Ini: **Termofilik (Suhu Tinggi)** - Membunuh patogen & biji gulma.")
+        
+        st.table(pd.DataFrame({
+            "Tanggal": [(current_time - timedelta(days=x)).strftime('%Y-%m-%d') for x in range(3)],
+            "Aktivitas": ["Pengecekan Rutin", "Pembalikan Tumpukan", "Inokulasi Aktivator Awal"],
+            "Operator": ["Budi", "Siti", "Budi"],
+            "Catatan": ["Suhu aman", "Kelembaban turun (siram air)", "Start proses"]
+        }))
 
     # --- 4. Quality Grading ---
     st.subheader("🏆 Final Quality Grading Prediction")
