@@ -12,6 +12,7 @@ def show():
     # --- Sidebar Controls ---
     with st.sidebar:
         st.header("⚙️ Parameter Kontrol")
+        input_waste_kg = st.number_input("Input Sampah Organik (kg)", min_value=100, step=50, value=1000)
         target_temp = st.slider("Target Suhu Inti (°C)", 40, 80, 60)
         target_moisture = st.slider("Target Kelembaban (%)", 30, 70, 50)
         batch_id = st.selectbox("Batch ID", ["BATCH-2026-001", "BATCH-2026-002", "BATCH-2026-003"])
@@ -51,11 +52,12 @@ def show():
         """, unsafe_allow_html=True)
 
     with kpi4:
-         st.markdown("""
+         estimated_yield = input_waste_kg * 0.6 # Approx 40% mass reduction due to moisture loss/co2
+         st.markdown(f"""
         <div class="metric-card">
             <h4 style="margin:0">Estimasi Output</h4>
-            <h1 style="color:#424242; margin:0">2.5 Ton</h1>
-            <p>Grade: <span style="background-color:#2E7d32; color:white; padding:2px 6px; border-radius:4px;">PREMIUM</span></p>
+            <h1 style="color:#424242; margin:0">{estimated_yield:,.0f} kg</h1>
+            <p>ASAL: {input_waste_kg} kg Sampah</p>
         </div>
         """, unsafe_allow_html=True)
 
