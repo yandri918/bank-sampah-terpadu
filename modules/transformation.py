@@ -27,15 +27,27 @@ def show():
     with col1:
         st.markdown("### Input Volume")
         inputs = {}
-        for item, price in prices.items():
+        dynamic_prices = {}
+        
+        # Header for the input columns
+        h1, h2, h3 = st.columns([3, 2, 2])
+        with h1: st.caption("**Kategori Limbah**")
+        with h2: st.caption("**Harga (Rp/kg)**")
+        with h3: st.caption("**Volume (kg)**")
+
+        for item, default_price in prices.items():
             # Use columns for compact view
-            c1, c2 = st.columns([3, 1])
+            c1, c2, c3 = st.columns([3, 2, 2])
             with c1:
                 st.write(f"**{item}**")
-                st.caption(f"Est. Rp {price}/kg")
             with c2:
+                # Editable price
+                new_price = st.number_input(f"Harga {item}", value=int(default_price), step=100, key=f"price_{item}", label_visibility="collapsed")
+                dynamic_prices[item] = new_price
+            with c3:
+                # Volume input
                 val = st.number_input(f"Kg {item}", min_value=0.0, step=0.5, key=f"p_{item}", label_visibility="collapsed")
-            inputs[item] = val
+                inputs[item] = val
 
     with col2:
         st.markdown("### Hasil Perhitungan")
@@ -44,9 +56,11 @@ def show():
         
         for item, weight in inputs.items():
             if weight > 0:
-                subtotal = weight * prices[item]
+                # Use the dynamic price input by user
+                current_price = dynamic_prices[item]
+                subtotal = weight * current_price
                 total_income += subtotal
-                df_list.append({"Kategori": item, "Berat (kg)": weight, "Harga/kg": prices[item], "Total (Rp)": subtotal})
+                df_list.append({"Kategori": item, "Berat (kg)": weight, "Harga/kg": current_price, "Total (Rp)": subtotal})
         
         if df_list:
             df = pd.DataFrame(df_list)
