@@ -279,7 +279,7 @@ def show():
     st.markdown("Simulasi detail Harga Pokok Produksi (HPP) dan potensi keuntungan dari pengolahan sampah organik.")
 
     # --- Economic Inputs (Sidebar or Top Config) ---
-    with st.expander("⚙️ Konfigurasi Biaya & Harga (Klik untuk Edit)", expanded=False):
+    with st.expander("⚙️ Konfigurasi Biaya & Harga (Klik untuk Edit)", expanded=True):
         ec1, ec2, ec3 = st.columns(3)
         with ec1:
             st.markdown("**1. Investasi Awal (CAPEX)**")
@@ -288,12 +288,26 @@ def show():
             depreciation_months = st.number_input("Penyusutan (Bulan)", value=60) # 5 Years
             
         with ec2:
-            st.markdown("**2. Biaya Operasional (OPEX Per Batch)**")
-            cost_labor = st.number_input("Upah Tenaga Kerja (Rp)", value=500000)
-            cost_activator = st.number_input("Bio-Aktivator/EM4 (Rp)", value=150000)
-            cost_additive = st.number_input("Gula/Molase/Dedak (Rp)", value=200000)
-            cost_energy = st.number_input("Listrik & BBM (Rp)", value=50000)
-            cost_packaging = st.number_input("Kemasan & Label (Rp)", value=200000)
+            st.markdown("**2. Biaya Operasional (OPEX)**")
+            # Dynamic Data Editor for Flexible Cost Structure
+            default_opex = pd.DataFrame([
+                {"Komponen": "Upah Tenaga Kerja", "Biaya (Rp)": 500000},
+                {"Komponen": "Bio-Aktivator/EM4", "Biaya (Rp)": 150000},
+                {"Komponen": "Nutrisi Tambahan (Molase)", "Biaya (Rp)": 200000},
+                {"Komponen": "Energi (Listrik/BBM)", "Biaya (Rp)": 50000},
+                {"Komponen": "Kemasan & Labeling", "Biaya (Rp)": 200000},
+            ])
+            edited_opex = st.data_editor(
+                default_opex, 
+                num_rows="dynamic", 
+                column_config={
+                    "Biaya (Rp)": st.column_config.NumberColumn(format="Rp %d")
+                },
+                key="opex_editor"
+            )
+            
+            total_opex = edited_opex["Biaya (Rp)"].sum()
+            st.caption(f"Total OPEX: Rp {total_opex:,.0f}")
             
         with ec3:
             st.markdown("**3. Harga Jual Produk**")
@@ -311,12 +325,10 @@ def show():
     monthly_depreciation = total_capex / depreciation_months
     batch_depreciation = monthly_depreciation / 4 # Assume 4 batches per month
     
-    total_opex = cost_labor + cost_activator + cost_additive + cost_energy + cost_packaging
+    # OPEX is now dynamic from editor
     total_cogs = total_opex + batch_depreciation # Total Cost per Batch
     
     # Unit Cost (HPP) - Weighted
-    # Simplify: Attribute cost proportional to revenue potential or just total / yield
-    # Let's simple average for now or focused on solid
     hpp_per_kg = total_cogs / (output_solid_kg + output_liquid_l) if (output_solid_kg + output_liquid_l) > 0 else 0
     
     # Revenue Calculation
@@ -329,10 +341,6 @@ def show():
     
     margin_pct = (net_profit / total_revenue) * 100 if total_revenue > 0 else 0
     roi_pct = (net_profit / total_cogs) * 100 if total_cogs > 0 else 0
-
-    # Break Even Point (Qty)
-    # BEP (Unit) = Fixed Costs / (Price - Variable Cost per Unit)
-    # Simplified here for batch context
     
     # --- Visualization ---
     tab_overview, tab_structure, tab_bep = st.tabs(["📊 Profit Sheet", "🍰 Struktur Biaya", "📉 Break-Even Analysis"])
@@ -347,12 +355,13 @@ def show():
         st.info(f"💡 **Insight:** Dengan modal Rp {total_cogs:,.0f}, Anda menghasilkan profit bersih Rp {net_profit:,.0f} per siklus.")
         
         # Waterfall Chart
+        # Use simple fixed categories for waterfall or dynamic? stick to simple for waterfall labels for now or aggregate
         fig_waterfall = go.Figure(go.Waterfall(
             name = "Profit Flow", orientation = "v",
-            measure = ["relative", "relative", "total", "relative", "relative", "relative", "relative", "relative", "total"],
-            x = ["Revenue (Solid)", "Revenue (POC)", "Total Sales", "Labor", "Material (Bio)", "Energi", "Kemasan", "Depresiasi", "Net Profit"],
+            measure = ["relative", "relative", "total", "relative", "relative", "relative", "total"],
+            x = ["Revenue (Solid)", "Revenue (POC)", "Total Sales", "Total OPEX", "Depresiasi", "Net Profit"], # Simplified
             textposition = "outside",
-            y = [rev_solid, rev_liquid, total_revenue, -cost_labor, -(cost_activator+cost_additive), -cost_energy, -cost_packaging, -batch_depreciation, net_profit],
+            y = [rev_solid, rev_liquid, total_revenue, -total_opex, -batch_depreciation, net_profit],
             connector = {"line":{"color":"rgb(63, 63, 63)"}},
         ))
         fig_waterfall.update_layout(title = "Profitability Waterfall (Alur Keuntungan)", height=400)
@@ -361,17 +370,17 @@ def show():
     with tab_structure:
         c_pie, c_data = st.columns([2, 1])
         with c_pie:
-            labels = ['SDM (Labor)', 'Bahan Baku (Bio+Add)', 'Energi', 'Kemasan', 'Penyusutan Mesin']
-            values = [cost_labor, cost_activator+cost_additive, cost_energy, cost_packaging, batch_depreciation]
-            fig_pie = px.pie(values=values, names=labels, title='Struktur Biaya Produksi (HPP)', hole=0.4)
+             # Prepare data for pie chart: OPEX components + Depreciation
+            pie_data = edited_opex.copy()
+            # Add Depreciation row
+            new_row = pd.DataFrame([{"Komponen": "Penyusutan Mesin", "Biaya (Rp)": batch_depreciation}])
+            pie_data = pd.concat([pie_data, new_row], ignore_index=True)
+            
+            fig_pie = px.pie(pie_data, values='Biaya (Rp)', names='Komponen', title='Struktur Biaya Produksi (HPP)', hole=0.4)
             st.plotly_chart(fig_pie, use_container_width=True)
         with c_data:
             st.write("**Detail Komponen Biaya:**")
-            st.table(pd.DataFrame({
-                'Komponen': labels,
-                'Nilai (Rp)': values,
-                'Persen (%)': [f"{(v/total_cogs)*100:.1f}%" for v in values]
-            }))
+            st.dataframe(pie_data, use_container_width=True)
             
     with tab_bep:
         st.markdown(f"##### Titik Impas (Break-Even Point)")
