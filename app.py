@@ -1,5 +1,5 @@
 import streamlit as st
-from modules import dashboard, waste_input, transformation, fertilizer_processing, price_settings, plastic_upcycling, ai_simulator, maggot_cultivation
+from modules import dashboard, waste_input, transformation, fertilizer_processing, price_settings, plastic_upcycling, ai_simulator, maggot_cultivation, data_management
 
 # Configure the page
 st.set_page_config(
@@ -57,7 +57,7 @@ with st.sidebar:
     
     menu = st.radio(
         "Navigasi",
-        ["Dashboard Utama", "Input Sampah (Pilah)", "Kalkulator Nilai Ekonomi", "Pupuk Organik Premium", "Budidaya Maggot BSF", "Pengaturan Harga", "Upcycling: Plastik ke Filamen", "AI Logic: Strategic Simulator", "Panduan 5R"],
+        ["Dashboard Utama", "Input Sampah (Pilah)", "Kalkulator Nilai Ekonomi", "Pupuk Organik Premium", "Budidaya Maggot BSF", "Pengaturan Harga", "Upcycling: Plastik ke Filamen", "AI Logic: Strategic Simulator", "Manajemen Data & Laporan", "Panduan 5R"],
         index=0
     )
     
@@ -84,6 +84,9 @@ elif menu == "Upcycling: Plastik ke Filamen":
     
 elif menu == "AI Logic: Strategic Simulator":
     ai_simulator.show()
+
+elif menu == "Manajemen Data & Laporan":
+    data_management.show()
 
 elif menu == "Panduan 5R":
     st.title("Panduan Pembuangan Sampah")
