@@ -82,5 +82,56 @@ elif menu == "Panduan 5R":
     except:
         st.warning("Gambar panduan belum dimuat. Pastikan file 'assets/guide_ref.jpg' tersedia.")
 
-    st.markdown("### Prinsip 5R")
-    st.info("Refuse (Tolak), Reduce (Kurangi), Reuse (Gunakan Kembali), Repurpose (Alih Fungsi), Recycle (Daur Ulang)")
+    st.markdown("### Prinsip 5R: Menuju Nol Limbah")
+    st.info("Penerapan pola pikir sirkular untuk meminimalkan dampak lingkungan.")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        with st.expander("1. Refuse (Tolak) 🚫", expanded=True):
+            st.markdown("""
+            **Definisi:** Menolak barang yang tidak perlu atau berpotensi menjadi sampah sulit urai.
+            - **Contoh:** 
+                - Tolak kantong plastik saat belanja, gunakan tas kain.
+                - Tolak sedotan plastik di restoran.
+                - Tolak brosur/spam mail fisik jika tersedia versi digital.
+            """)
+
+        with st.expander("2. Reduce (Kurangi) 📉", expanded=True):
+            st.markdown("""
+            **Definisi:** Mengurangi konsumsi sumber daya dan penggunaan barang sekali pakai.
+            - **Contoh:**
+                - Beli produk dalam kemasan besar (bulk) untuk kurangi sampah sachet.
+                - Kurangi penggunaan kertas dengan mencetak bolak-balik.
+                - Hemat energi dan air di rumah.
+            """)
+
+        with st.expander("3. Reuse (Gunakan Kembali) 🔄", expanded=True):
+            st.markdown("""
+            **Definisi:** Menggunakan kembali barang untuk fungsi yang sama atau berbeda tanpa mengubah bentuk drastis.
+            - **Contoh:**
+                - Gunakan botol kaca bekas selai untuk wadah bumbu.
+                - Sumbangkan pakaian layak pakai alih-alih membuangnya.
+                - Gunakan baterai isi ulang (rechargeable).
+            """)
+
+    with col2:
+        with st.expander("4. Repurpose (Alih Fungsi) 🎨", expanded=True):
+            st.markdown("""
+            **Definisi:** Memodifikasi barang bekas untuk kegunaan baru yang kreatif (Upcycling).
+            - **Contoh:**
+                - Ban bekas disulap menjadi kursi atau pot tanaman.
+                - Kulit buah jeruk diolah menjadi eco-enzyme pembersih lantai.
+                - Kaos bekas dijadikan kain lap atau tote bag.
+            """)
+
+        with st.expander("5. Recycle (Daur Ulang) ♻️", expanded=True):
+            st.markdown("""
+            **Definisi:** Mengolah sampah menjadi bahan baku baru melalui proses industri atau pengomposan.
+            - **Contoh:**
+                - **Bank Sampah:** Setor botol PET untuk dilebur jadi bijih plastik.
+                - **Kompos:** Olah sisa makanan menjadi pupuk organik (Emas Hijau).
+                - **Kertas:** Daur ulang kardus bekas menjadi bubur kertas.
+            """)
+    
+    st.success("Mulai dari langkah kecil: **Pilah Sampahmu dari Rumah!**")
