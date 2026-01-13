@@ -20,6 +20,12 @@ def show():
         "Limbah Berbahaya": 0                   # Cost to dispose usually
     }
 
+    # Init Session State for Prices & Inputs if not exists
+    if 'custom_prices' not in st.session_state:
+        st.session_state.custom_prices = prices.copy()
+    if 'calc_inputs' not in st.session_state:
+        st.session_state.calc_inputs = {k: 0.0 for k in prices.keys()}
+
     st.subheader("Simulasi Pendapatan")
     
     col1, col2 = st.columns([1, 1])
@@ -41,12 +47,18 @@ def show():
             with c1:
                 st.write(f"**{item}**")
             with c2:
-                # Editable price
-                new_price = st.number_input(f"Harga {item}", value=int(default_price), step=100, key=f"price_{item}", label_visibility="collapsed")
+                # Editable price (Persisted)
+                current_p = st.session_state.custom_prices.get(item, default_price)
+                new_price = st.number_input(f"Harga {item}", value=int(current_p), step=100, key=f"price_{item}", label_visibility="collapsed")
+                # Update Session State immediately if changed (though Streamlit usually handles 'key' binding, explicit update is safer for our dict tracking)
+                st.session_state.custom_prices[item] = new_price
                 dynamic_prices[item] = new_price
+                
             with c3:
-                # Volume input
-                val = st.number_input(f"Kg {item}", min_value=0.0, step=0.5, key=f"p_{item}", label_visibility="collapsed")
+                # Volume input (Persisted)
+                current_v = st.session_state.calc_inputs.get(item, 0.0)
+                val = st.number_input(f"Kg {item}", value=float(current_v), min_value=0.0, step=0.5, key=f"p_{item}", label_visibility="collapsed")
+                st.session_state.calc_inputs[item] = val
                 inputs[item] = val
 
     with col2:
