@@ -76,10 +76,10 @@ elif menu == "Pupuk Organik Premium":
 elif menu == "Pengaturan Harga":
     price_settings.show()
 elif menu == "Upcycling: Plastik ke Filamen":
-    modules.plastic_upcycling.show()
+    plastic_upcycling.show()
     
 elif menu == "AI Logic: Strategic Simulator":
-    modules.ai_simulator.show()
+    ai_simulator.show()
 
 elif menu == "Panduan 5R":
     st.title("Panduan Pembuangan Sampah")
