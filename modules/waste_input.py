@@ -195,7 +195,7 @@ def show():
         
         for name, w, p in items_list:
             if w > 0:
-                items_html += f"<tr><td>{name}</td><td>{w} kg</td><td style='text-align:right'>Rp {w*p:,.0f}</td></tr>"
+                items_html += f"<tr><td>{name}</td><td>{round(w, 2)} kg</td><td style='text-align:right'>Rp {w*p:,.0f}</td></tr>"
 
         html_receipt = f"""
         <html>
@@ -211,6 +211,10 @@ def show():
                 {items_html}
             </table>
             <hr>
+            <div style="display:flex; justify-content:space-between">
+                <b>TOTAL BERAT</b>
+                <b>{total_kg} kg</b>
+            </div>
             <div style="display:flex; justify-content:space-between">
                 <b>TOTAL BAYAR</b>
                 <b>Rp {total_paid:,.0f}</b>
