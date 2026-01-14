@@ -107,6 +107,12 @@ def show():
 
         gross_profit = total_revenue - total_paid
         total_kg = w_burn + w_paper + w_cloth + w_cans + w_elec + w_pet + w_plas + w_tray + w_glass + w_metal + w_haz
+        
+        # Rounding for cleanliness
+        total_kg = round(total_kg, 2)
+        total_paid = round(total_paid, 0)
+        total_revenue = round(total_revenue, 0)
+        gross_profit = round(gross_profit, 0)
 
         # --- 2. Data Persistence ---
         new_data = {
