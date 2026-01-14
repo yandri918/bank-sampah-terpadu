@@ -1,5 +1,5 @@
 import streamlit as st
-from modules import dashboard, waste_input, transformation, fertilizer_processing, price_settings, plastic_upcycling, ai_simulator, maggot_cultivation, data_management, pyrolysis
+from modules import dashboard, waste_input, transformation, fertilizer_processing, price_settings, plastic_upcycling, ai_simulator, maggot_cultivation, data_management, pyrolysis, prediction_dashboard
 
 # Configure the page
 st.set_page_config(
@@ -48,108 +48,131 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Sidebar
-with st.sidebar:
-    st.image("https://img.icons8.com/color/96/000000/recycle-sign.png", width=80)
-    st.title("Bank Sampah Terpadu")
-    st.markdown("### *AgriSensa Ecosystem*")
-    st.info("Transformasi Limbah Menjadi Emas Hijau & Bahan Baku Presisi")
+# Check Authentication Status
+if 'logged_in' not in st.session_state:
+    st.session_state['logged_in'] = False
+
+if not st.session_state['logged_in']:
+    from modules import login_page
+    login_page.show()
     
-    menu = st.radio(
-        "Navigasi",
-        ["Dashboard Utama", "Input Sampah (Pilah)", "Kalkulator Nilai Ekonomi", "Pupuk Organik Premium", "Budidaya Maggot BSF", "Pengaturan Harga", "Upcycling: Plastik ke Filamen", "Energy: Pyrolysis (Plastik BBM)", "AI Logic: Strategic Simulator", "Manajemen Data & Laporan", "Panduan 5R"],
-        index=0
-    )
+else:
+    # --- AUTHENTICATED AREA ---
     
-    st.markdown("---")
-    st.caption("© 2026 AgriSensa - Circular Economy")
+    # Sidebar
+    with st.sidebar:
+        st.image("https://img.icons8.com/color/96/000000/recycle-sign.png", width=80)
+        st.title("AgriSensa Hub")
+        
+        # User Profile Widget
+        user_name = st.session_state.get('user_info', {}).get('name', 'User')
+        st.success(f"👤 Hai, {user_name}")
+        
+        st.markdown("### *Integrated Ecosystem*")
+        st.info("Transformasi Limbah Menjadi Emas Hijau & Bahan Baku Presisi")
+        
+        menu = st.radio(
+            "Navigasi",
+            ["Dashboard Utama", "Input Sampah (Pilah)", "Simulasi Live & Prediksi", "Kalkulator Nilai Ekonomi", "Pupuk Organik Premium", "Budidaya Maggot BSF", "Pengaturan Harga", "Upcycling: Plastik ke Filamen", "Energy: Pyrolysis (Plastik BBM)", "AI Logic: Strategic Simulator", "Manajemen Data & Laporan", "Panduan 5R"],
+            index=0
+        )
+        
+        st.markdown("---")
+        from modules import auth_service
+        if st.button("🚪 Logout", use_container_width=True):
+            auth_service.logout()
+            st.rerun()
+            
+        st.caption("© 2026 AgriSensa - Circular Economy")
 
-# Router
-if menu == "Dashboard Utama":
-    dashboard.show()
-elif menu == "Input Sampah (Pilah)":
-    waste_input.show()
-elif menu == "Kalkulator Nilai Ekonomi":
-    transformation.show()
-elif menu == "Pupuk Organik Premium":
-    fertilizer_processing.show()
+    # Router
+    if menu == "Dashboard Utama":
+        dashboard.show()
+    elif menu == "Input Sampah (Pilah)":
+        waste_input.show()
+    elif menu == "Simulasi Live & Prediksi":
+        prediction_dashboard.show()
+    elif menu == "Kalkulator Nilai Ekonomi":
+        transformation.show()
+    elif menu == "Pupuk Organik Premium":
+        fertilizer_processing.show()
+        
+    elif menu == "Budidaya Maggot BSF":
+         maggot_cultivation.show()
     
-elif menu == "Budidaya Maggot BSF":
-     maggot_cultivation.show()
-
-elif menu == "Pengaturan Harga":
-    price_settings.show()
-elif menu == "Upcycling: Plastik ke Filamen":
-    plastic_upcycling.show()
-
-elif menu == "Energy: Pyrolysis (Plastik BBM)":
-    pyrolysis.show()
+    elif menu == "Pengaturan Harga":
+        price_settings.show()
+    elif menu == "Upcycling: Plastik ke Filamen":
+        plastic_upcycling.show()
     
-elif menu == "AI Logic: Strategic Simulator":
-    ai_simulator.show()
-
-elif menu == "Manajemen Data & Laporan":
-    data_management.show()
-
-elif menu == "Panduan 5R":
-    st.title("Panduan Pembuangan Sampah")
-    st.markdown("Berikut adalah panduan visual klasifikasi sampah (Standard Acuan).")
+    elif menu == "Energy: Pyrolysis (Plastik BBM)":
+        pyrolysis.show()
+        
+    elif menu == "AI Logic: Strategic Simulator":
+        ai_simulator.show()
     
-    try:
-        st.image("assets/guide_ref.jpg", caption="Panduan Klasifikasi Sampah Rumah Tangga", use_column_width=True)
-    except:
-        st.warning("Gambar panduan belum dimuat. Pastikan file 'assets/guide_ref.jpg' tersedia.")
-
-    st.markdown("### Prinsip 5R: Menuju Nol Limbah")
-    st.info("Penerapan pola pikir sirkular untuk meminimalkan dampak lingkungan.")
+    elif menu == "Manajemen Data & Laporan":
+        data_management.show()
     
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        with st.expander("1. Refuse (Tolak) 🚫", expanded=True):
-            st.markdown("""
-            **Definisi:** Menolak barang yang tidak perlu atau berpotensi menjadi sampah sulit urai.
-            - **Contoh:** 
-                - Tolak kantong plastik saat belanja, gunakan tas kain.
-                - Tolak sedotan plastik di restoran.
-                - Tolak brosur/spam mail fisik jika tersedia versi digital.
-            """)
+    elif menu == "Panduan 5R":
+        st.title("Panduan Pembuangan Sampah")
+        st.markdown("Berikut adalah panduan visual klasifikasi sampah (Standard Acuan).")
+        
+        try:
+            st.image("assets/guide_ref.jpg", caption="Panduan Klasifikasi Sampah Rumah Tangga", use_column_width=True)
+        except:
+            st.warning("Gambar panduan belum dimuat. Pastikan file 'assets/guide_ref.jpg' tersedia.")
 
-        with st.expander("2. Reduce (Kurangi) 📉", expanded=True):
-            st.markdown("""
-            **Definisi:** Mengurangi konsumsi sumber daya dan penggunaan barang sekali pakai.
-            - **Contoh:**
-                - Beli produk dalam kemasan besar (bulk) untuk kurangi sampah sachet.
-                - Kurangi penggunaan kertas dengan mencetak bolak-balik.
-                - Hemat energi dan air di rumah.
-            """)
+        st.markdown("### Prinsip 5R: Menuju Nol Limbah")
+        st.info("Penerapan pola pikir sirkular untuk meminimalkan dampak lingkungan.")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            with st.expander("1. Refuse (Tolak) 🚫", expanded=True):
+                st.markdown("""
+                **Definisi:** Menolak barang yang tidak perlu atau berpotensi menjadi sampah sulit urai.
+                - **Contoh:** 
+                    - Tolak kantong plastik saat belanja, gunakan tas kain.
+                    - Tolak sedotan plastik di restoran.
+                    - Tolak brosur/spam mail fisik jika tersedia versi digital.
+                """)
 
-        with st.expander("3. Reuse (Gunakan Kembali) 🔄", expanded=True):
-            st.markdown("""
-            **Definisi:** Menggunakan kembali barang untuk fungsi yang sama atau berbeda tanpa mengubah bentuk drastis.
-            - **Contoh:**
-                - Gunakan botol kaca bekas selai untuk wadah bumbu.
-                - Sumbangkan pakaian layak pakai alih-alih membuangnya.
-                - Gunakan baterai isi ulang (rechargeable).
-            """)
+            with st.expander("2. Reduce (Kurangi) 📉", expanded=True):
+                st.markdown("""
+                **Definisi:** Mengurangi konsumsi sumber daya dan penggunaan barang sekali pakai.
+                - **Contoh:**
+                    - Beli produk dalam kemasan besar (bulk) untuk kurangi sampah sachet.
+                    - Kurangi penggunaan kertas dengan mencetak bolak-balik.
+                    - Hemat energi dan air di rumah.
+                """)
 
-    with col2:
-        with st.expander("4. Repurpose (Alih Fungsi) 🎨", expanded=True):
-            st.markdown("""
-            **Definisi:** Memodifikasi barang bekas untuk kegunaan baru yang kreatif (Upcycling).
-            - **Contoh:**
-                - Ban bekas disulap menjadi kursi atau pot tanaman.
-                - Kulit buah jeruk diolah menjadi eco-enzyme pembersih lantai.
-                - Kaos bekas dijadikan kain lap atau tote bag.
-            """)
+            with st.expander("3. Reuse (Gunakan Kembali) 🔄", expanded=True):
+                st.markdown("""
+                **Definisi:** Menggunakan kembali barang untuk fungsi yang sama atau berbeda tanpa mengubah bentuk drastis.
+                - **Contoh:**
+                    - Gunakan botol kaca bekas selai untuk wadah bumbu.
+                    - Sumbangkan pakaian layak pakai alih-alih membuangnya.
+                    - Gunakan baterai isi ulang (rechargeable).
+                """)
 
-        with st.expander("5. Recycle (Daur Ulang) ♻️", expanded=True):
-            st.markdown("""
-            **Definisi:** Mengolah sampah menjadi bahan baku baru melalui proses industri atau pengomposan.
-            - **Contoh:**
-                - **Bank Sampah:** Setor botol PET untuk dilebur jadi bijih plastik.
-                - **Kompos:** Olah sisa makanan menjadi pupuk organik (Emas Hijau).
-                - **Kertas:** Daur ulang kardus bekas menjadi bubur kertas.
-            """)
-    
-    st.success("Mulai dari langkah kecil: **Pilah Sampahmu dari Rumah!**")
+        with col2:
+            with st.expander("4. Repurpose (Alih Fungsi) 🎨", expanded=True):
+                st.markdown("""
+                **Definisi:** Memodifikasi barang bekas untuk kegunaan baru yang kreatif (Upcycling).
+                - **Contoh:**
+                    - Ban bekas disulap menjadi kursi atau pot tanaman.
+                    - Kulit buah jeruk diolah menjadi eco-enzyme pembersih lantai.
+                    - Kaos bekas dijadikan kain lap atau tote bag.
+                """)
+
+            with st.expander("5. Recycle (Daur Ulang) ♻️", expanded=True):
+                st.markdown("""
+                **Definisi:** Mengolah sampah menjadi bahan baku baru melalui proses industri atau pengomposan.
+                - **Contoh:**
+                    - **Bank Sampah:** Setor botol PET untuk dilebur jadi bijih plastik.
+                    - **Kompos:** Olah sisa makanan menjadi pupuk organik (Emas Hijau).
+                    - **Kertas:** Daur ulang kardus bekas menjadi bubur kertas.
+                """)
+        
+        st.success("Mulai dari langkah kecil: **Pilah Sampahmu dari Rumah!**")
