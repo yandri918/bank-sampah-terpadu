@@ -108,11 +108,11 @@ def show():
         gross_profit = total_revenue - total_paid
         total_kg = w_burn + w_paper + w_cloth + w_cans + w_elec + w_pet + w_plas + w_tray + w_glass + w_metal + w_haz
         
-        # Rounding for cleanliness
+        # Rounding for cleanliness (Financials to Int)
         total_kg = round(total_kg, 2)
-        total_paid = round(total_paid, 0)
-        total_revenue = round(total_revenue, 0)
-        gross_profit = round(gross_profit, 0)
+        total_paid = int(round(total_paid, 0))
+        total_revenue = int(round(total_revenue, 0))
+        gross_profit = int(round(gross_profit, 0))
 
         # --- 2. Data Persistence ---
         new_data = {
@@ -121,11 +121,11 @@ def show():
             "Nasabah": [nasabah],
             "Petugas": [petugas],
             "Lokasi": [lokasi],
-            # Weights
-            "Burnable": [w_burn], "Paper": [w_paper], "Cloth": [w_cloth], "Cans": [w_cans],
-            "Electronics": [w_elec], "PET_Bottles": [w_pet], "Plastic_Marks": [w_plas],
-            "White_Trays": [w_tray], "Glass_Bottles": [w_glass], "Metal_Small": [w_metal], "Hazardous": [w_haz],
-            # Financials
+            # Weights (Rounded to 2 decimals)
+            "Burnable": [round(w_burn, 2)], "Paper": [round(w_paper, 2)], "Cloth": [round(w_cloth, 2)], "Cans": [round(w_cans, 2)],
+            "Electronics": [round(w_elec, 2)], "PET_Bottles": [round(w_pet, 2)], "Plastic_Marks": [round(w_plas, 2)],
+            "White_Trays": [round(w_tray, 2)], "Glass_Bottles": [round(w_glass, 2)], "Metal_Small": [round(w_metal, 2)], "Hazardous": [round(w_haz, 2)],
+            # Financials ( Integers)
             "Total_Bayar_Nasabah": [total_paid],
             "Est_Pendapatan_Bank": [total_revenue],
             "Est_Profit": [gross_profit]
