@@ -7,11 +7,13 @@ def show():
     st.markdown("Monitoring Ekosistem Bank Sampah")
 
     import os
+    from modules import auth_db
 
     # Load Real Data if available
-    file_path = "data/waste_data.csv"
-    if os.path.exists(file_path):
-        df = pd.read_csv(file_path)
+    df = auth_db.get_all_transactions()
+    
+    if not df.empty:
+        # df['Tanggal'] already handled by get_all_transactions or needs to be ensured as datetime
         df['Tanggal'] = pd.to_datetime(df['Tanggal'])
         
         # Calculate Metrics

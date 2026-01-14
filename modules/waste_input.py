@@ -116,32 +116,27 @@ def show():
 
         # --- 2. Data Persistence ---
         new_data = {
-            "Timestamp": [datetime.datetime.now()],
-            "Tanggal": [tanggal_setor],
-            "Nasabah": [nasabah],
-            "Petugas": [petugas],
-            "Lokasi": [lokasi],
+            "Tanggal": tanggal_setor,
+            "Nasabah": nasabah,
+            "Petugas": petugas,
+            "Lokasi": lokasi,
             # Weights (Rounded to 2 decimals)
-            "Burnable": [round(w_burn, 2)], "Paper": [round(w_paper, 2)], "Cloth": [round(w_cloth, 2)], "Cans": [round(w_cans, 2)],
-            "Electronics": [round(w_elec, 2)], "PET_Bottles": [round(w_pet, 2)], "Plastic_Marks": [round(w_plas, 2)],
-            "White_Trays": [round(w_tray, 2)], "Glass_Bottles": [round(w_glass, 2)], "Metal_Small": [round(w_metal, 2)], "Hazardous": [round(w_haz, 2)],
+            "Burnable": round(w_burn, 2), "Paper": round(w_paper, 2), "Cloth": round(w_cloth, 2), "Cans": round(w_cans, 2),
+            "Electronics": round(w_elec, 2), "PET_Bottles": round(w_pet, 2), "Plastic_Marks": round(w_plas, 2),
+            "White_Trays": round(w_tray, 2), "Glass_Bottles": round(w_glass, 2), "Metal_Small": round(w_metal, 2), "Hazardous": round(w_haz, 2),
             # Financials ( Integers)
-            "Total_Bayar_Nasabah": [total_paid],
-            "Est_Pendapatan_Bank": [total_revenue],
-            "Est_Profit": [gross_profit]
+            "Total_Bayar_Nasabah": total_paid,
+            "Est_Pendapatan_Bank": total_revenue,
+            "Est_Profit": gross_profit,
+            "total_kg": total_kg
         }
-        df_new = pd.DataFrame(new_data)
         
-        file_path = "data/waste_data.csv"
-        os.makedirs("data", exist_ok=True)
-        
-        if not os.path.exists(file_path):
-            df_new.to_csv(file_path, index=False)
+        # --- 2. Data Persistence (SQLite) ---
+        from modules import auth_db
+        if auth_db.save_transaction(new_data):
+            pass # Creating successful
         else:
-            try:
-                df_new.to_csv(file_path, mode='a', header=False, index=False)
-            except Exception as e:
-                st.error(f"Gagal menyimpan data: {e}")
+             st.error("Gagal menyimpan data ke database.")
 
         # --- 3. Visual Feedback (Financial Dashboard) ---
         st.success("Transaksi Berhasil Disimpan!")

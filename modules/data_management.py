@@ -13,11 +13,12 @@ def show():
     # --- TAB 1: Transaction Data (CSV) ---
     with tab1:
         st.subheader("Rekap Transaksi Harian")
-        csv_file = "data/waste_data.csv"
         
-        if os.path.exists(csv_file):
+        from modules import auth_db
+        df = auth_db.get_all_transactions()
+        
+        if not df.empty:
             try:
-                df = pd.read_csv(csv_file)
                 
                 # --- 1. Simplified Summary View ---
                 st.markdown("#### 📋 Ringkasan Transaksi")
