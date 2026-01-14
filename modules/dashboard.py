@@ -10,7 +10,9 @@ def show():
     from modules import auth_db
 
     # Load Real Data if available
-    df = auth_db.get_all_transactions()
+    # Filter by Current Logged In User
+    current_user_name = st.session_state.get('user_info', {}).get('name')
+    df = auth_db.get_all_transactions(petugas_filter=current_user_name)
     
     if not df.empty:
         # df['Tanggal'] already handled by get_all_transactions or needs to be ensured as datetime

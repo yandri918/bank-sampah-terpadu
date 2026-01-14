@@ -116,11 +116,18 @@ def save_transaction(data):
     finally:
         conn.close()
 
-def get_all_transactions():
-    """Fetch all transactions as a Pandas DataFrame."""
+def get_all_transactions(petugas_filter=None):
+    """Fetch transactions as a Pandas DataFrame, optionally filtered by petugas."""
     conn = get_connection()
     try:
-        df = pd.read_sql_query("SELECT * FROM transactions", conn)
+        query = "SELECT * FROM transactions"
+        params = ()
+        
+        if petugas_filter:
+            query += " WHERE petugas = ?"
+            params = (petugas_filter,)
+            
+        df = pd.read_sql_query(query, conn, params=params)
         # Rename columns to match legacy CSV format for compatibility if needed, 
         # or just map them properly in the dashboard.
         

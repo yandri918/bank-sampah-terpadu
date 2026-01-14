@@ -25,7 +25,9 @@ def show():
         with c_cust:
             nasabah = st.text_input("👤 Nama Nasabah", placeholder="Contoh: Bu Siti / RT 05")
         with c_staff:
-            petugas = st.text_input("👮 Petugas", placeholder="Nama Admin")
+            # Auto-fill Officer Name (Locked)
+            current_officer = st.session_state.get('user_info', {}).get('name', 'Petugas')
+            petugas = st.text_input("👮 Petugas", value=current_officer, disabled=True)
         with c_loc:
             lokasi = st.selectbox("📍 Lokasi", ["Unit Pusat", "Unit Satelit 1", "Unit Satelit 2"])
 
