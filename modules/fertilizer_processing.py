@@ -233,12 +233,17 @@ def show():
         st.markdown(f"**Batch Start:** {start_datetime.strftime('%d %B %Y %H:%M')}")
         st.info("ℹ️ Fase Saat Ini: **Termofilik (Suhu Tinggi)** - Membunuh patogen & biji gulma.")
         
-        st.table(pd.DataFrame({
-            "Tanggal": [(current_time - timedelta(days=x)).strftime('%Y-%m-%d') for x in range(3)],
-            "Aktivitas": ["Pengecekan Rutin", "Pembalikan Tumpukan", "Inokulasi Aktivator Awal"],
-            "Operator": ["Budi", "Siti", "Budi"],
-            "Catatan": ["Suhu aman", "Kelembaban turun (siram air)", "Start proses"]
-        }))
+        st.data_editor(
+            pd.DataFrame({
+                "Tanggal": [(current_time - timedelta(days=x)).strftime('%Y-%m-%d') for x in range(3)],
+                "Aktivitas": ["Pengecekan Rutin", "Pembalikan Tumpukan", "Inokulasi Aktivator Awal"],
+                "Operator": ["Budi", "Siti", "Budi"],
+                "Catatan": ["Suhu aman", "Kelembaban turun (siram air)", "Start proses"]
+            }),
+            use_container_width=True,
+            num_rows="dynamic",
+            hide_index=True
+        )
 
     # --- 4. Quality Grading & Lab Simulation (Material Specific) ---
     st.subheader("📊 Analisis Kandungan Hara (NPK Lab Simulation)")
