@@ -1,5 +1,18 @@
 import streamlit as st
-from modules import dashboard, waste_input, transformation, fertilizer_processing, price_settings, plastic_upcycling, ai_simulator, maggot_cultivation, data_management, pyrolysis, prediction_dashboard
+from modules import (
+    ai_simulator,
+    dashboard,
+    data_management,
+    fertilizer_processing,
+    gform_dashboard,
+    maggot_cultivation,
+    plastic_upcycling,
+    prediction_dashboard,
+    price_settings,
+    pyrolysis,
+    transformation,
+    waste_input,
+)
 
 # Configure the page
 st.set_page_config(
@@ -73,7 +86,21 @@ else:
         
         menu = st.radio(
             "Navigasi",
-            ["Dashboard Utama", "Input Sampah (Pilah)", "Simulasi Live & Prediksi", "Kalkulator Nilai Ekonomi", "Pupuk Organik Premium", "Budidaya Maggot BSF", "Pengaturan Harga", "Upcycling: Plastik ke Filamen", "Energy: Pyrolysis (Plastik BBM)", "AI Logic: Strategic Simulator", "Manajemen Data & Laporan", "Panduan 5R"],
+            [
+                "Dashboard Utama",
+                "Input Sampah (Pilah)",
+                "Dashboard Google Form",
+                "Simulasi Live & Prediksi",
+                "Kalkulator Nilai Ekonomi",
+                "Pupuk Organik Premium",
+                "Budidaya Maggot BSF",
+                "Pengaturan Harga",
+                "Upcycling: Plastik ke Filamen",
+                "Energy: Pyrolysis (Plastik BBM)",
+                "AI Logic: Strategic Simulator",
+                "Manajemen Data & Laporan",
+                "Panduan 5R",
+            ],
             index=0
         )
         
@@ -90,6 +117,8 @@ else:
         dashboard.show()
     elif menu == "Input Sampah (Pilah)":
         waste_input.show()
+    elif menu == "Dashboard Google Form":
+        gform_dashboard.show()
     elif menu == "Simulasi Live & Prediksi":
         prediction_dashboard.show()
     elif menu == "Kalkulator Nilai Ekonomi":

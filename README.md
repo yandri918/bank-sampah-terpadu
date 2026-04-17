@@ -5,6 +5,11 @@ Modul ini adalah bagian dari ekosistem **AgriSensa**, yang didedikasikan untuk p
 ## Fitur Utama
 
 - **Dashboard Monitoring**: Visualisasi real-time dari sampah yang terkumpul.
+- **Dashboard Google Form**: Menarik data response Google Form dari Google Sheet dan menampilkan:
+  - Database Nasabah
+  - Alur Sampah
+  - Pembukuan
+  - Keuangan
 - **Standar Pemilahan Jepang**:
   - *Moeru Gomi* (Sampah yang bisa dibakar/Organik)
   - *Shigen Gomi* (Sampah Daur Ulang bernilai)
@@ -23,6 +28,21 @@ Modul ini adalah bagian dari ekosistem **AgriSensa**, yang didedikasikan untuk p
    ```bash
    streamlit run app.py
    ```
+
+## Integrasi Google Form
+
+1. Buka Google Form Anda dan masuk ke tab **Responses**.
+2. Klik ikon Google Sheet untuk membuat lembar response.
+3. Ubah sharing Google Sheet menjadi **Anyone with the link can view**.
+4. Jalankan app Streamlit, lalu buka menu **Dashboard Google Form**.
+5. Tempel URL Google Sheet response ke field yang tersedia.
+
+Opsional via secrets Streamlit:
+
+```toml
+# .streamlit/secrets.toml
+BANK_SAMPAH_SHEET_URL = "https://docs.google.com/spreadsheets/d/<sheet_id>/edit#gid=0"
+```
 
 ## Teknologi
 

@@ -9,7 +9,7 @@ def show():
 
     # 1. Init Data
     # Load base prices from system config but allow edits in session
-    if 'sim_data' not in st.session_state:
+    if 'transformation_sim_data' not in st.session_state:
         # Load from central config
         base_prices = load_prices()
         # Transform to list of dicts for DataFrame
@@ -21,7 +21,7 @@ def show():
                 "Berat (kg)": 0.0,
                 "Estimasi (Rp)": 0
             })
-        st.session_state.sim_data = pd.DataFrame(initial_data)
+        st.session_state.transformation_sim_data = pd.DataFrame(initial_data)
 
     # 2. Interactive Editor (Excel-like)
     st.subheader("📝 Input Parameter Simulasi")
@@ -33,14 +33,14 @@ def show():
         "Berat (kg)": st.column_config.NumberColumn("Volume (kg)", step=0.5, min_value=0.0, format="%.1f kg", width="small"),
         "Estimasi (Rp)": st.column_config.NumberColumn("Total", disabled=True, format="Rp %d")  # Computed dynamically
     }
-
+ 
     # Layout: Editor (Left) vs Visuals (Right)
     col_edit, col_viz = st.columns([1.2, 1])
 
     with col_edit:
         # We use data_editor to allow direct editing
         edited_df = st.data_editor(
-            st.session_state.sim_data,
+            st.session_state.transformation_sim_data,
             column_config=column_cfg,
             use_container_width=True,
             hide_index=True,
@@ -56,7 +56,7 @@ def show():
         edited_df["Estimasi (Rp)"] = edited_df["Estimasi (Rp)"].astype(int)
         
         # Save back to state to persist edits during reruns
-        st.session_state.sim_data = edited_df
+        st.session_state.transformation_sim_data = edited_df
 
         # Summary Metrics within Edit Column for quick view
         total_omzet = edited_df["Estimasi (Rp)"].sum()
@@ -110,7 +110,7 @@ def show():
     ac1, ac2 = st.columns([1, 4])
     with ac1:
         if st.button("🔄 Reset Simulasi"):
-            del st.session_state.sim_data
+            del st.session_state.transformation_sim_data
             st.rerun()
     with ac2:
         if total_omzet > 0:

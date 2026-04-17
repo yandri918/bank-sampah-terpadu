@@ -12,7 +12,7 @@ def show():
     prices = load_prices()
     
     # 2. Initialize Data for Editor if not in session
-    if 'sim_data' not in st.session_state:
+    if 'prediction_sim_data' not in st.session_state:
         # Create initial dataframe structure
         data = []
         for cat, val in prices.items():
@@ -22,14 +22,14 @@ def show():
                 "Harga Beli (Rp)": val['buy'],
                 "Harga Jual (Rp)": val['sell']
             })
-        st.session_state['sim_data'] = pd.DataFrame(data)
+        st.session_state['prediction_sim_data'] = pd.DataFrame(data)
 
     # 3. Interactive Data Editor
     # We use data_editor to let user input weights
     st.info("👇 **Edit kolom 'Berat (kg)' di bawah ini:**")
     
     edited_df = st.data_editor(
-        st.session_state['sim_data'],
+        st.session_state['prediction_sim_data'],
         column_config={
             "Kategori": st.column_config.TextColumn(disabled=True),
             "Berat (kg)": st.column_config.NumberColumn(min_value=0, step=1, format="%.1f kg"),
@@ -105,5 +105,5 @@ def show():
             
     # Reset Button
     if st.button("🔄 Reset Simulasi"):
-        del st.session_state['sim_data']
+        del st.session_state['prediction_sim_data']
         st.rerun()
