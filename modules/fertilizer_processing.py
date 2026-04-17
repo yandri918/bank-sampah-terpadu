@@ -231,7 +231,7 @@ def show():
     # --- 3.5 Related Info (Logs) ---
     with st.expander("📝 Log Catatan & Informasi Terkait", expanded=True):
         st.markdown(f"**Batch Start:** {start_datetime.strftime('%d %B %Y %H:%M')}")
-        st.info("ℹ️ Fase Saat Ini: **Termofilik (Suhu Tinggi)** - Membunuh patogen & biji gulma.")
+        st.info("ℹ️ **FASE AKTIF SAAT INI: Termofilik (Suhu Tinggi)** - Membunuh patogen & biji gulma.")
         
         st.data_editor(
             pd.DataFrame({
