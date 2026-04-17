@@ -89,7 +89,6 @@ else:
             [
                 "Dashboard Utama",
                 "Input Sampah (Pilah)",
-                "Dashboard Google Form",
                 "Simulasi Live & Prediksi",
                 "Kalkulator Nilai Ekonomi",
                 "Pupuk Organik Premium",
@@ -117,8 +116,6 @@ else:
         dashboard.show()
     elif menu == "Input Sampah (Pilah)":
         waste_input.show()
-    elif menu == "Dashboard Google Form":
-        gform_dashboard.show()
     elif menu == "Simulasi Live & Prediksi":
         prediction_dashboard.show()
     elif menu == "Kalkulator Nilai Ekonomi":
